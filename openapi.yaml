@@ -1,0 +1,65 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Ayn.io
+  license:
+    name: GPLv3
+servers:
+  - url: https://localhost:11249
+    description: control API
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        content:
+          type: object
+    SignedPost:
+      allOf:
+        - $ref: '#/components/schemas/Post'
+        - type: object
+          properties:
+            key:
+              type: object
+              properties:
+                crt:
+                  type: string
+            sig:
+              type: object
+              properties:
+                hash:
+                  type: string
+paths:
+  /sign/{key}:
+    post:
+      summary: Sign a post
+      parameters:
+        - in: path
+          name: key
+          schema:
+            type: string
+          required: true
+          description: key name
+      requestBody:
+        required: true
+        description: unsigned post
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '200':
+          description: signed post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedPost'
+  /posts:
+    get:
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedPost'
